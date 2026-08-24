@@ -48,10 +48,10 @@ export AI_SDLC_LLM_MODEL=<model>
 키와 내부 URL은 저장소나 생성 문서에 기록하지 않는다. 모델 공급자가 없어도 로컬 분석,
 결정적 검사, QA, 로컬 배포 단계는 동작한다.
 
-## srope에서 사용
+## 대상 프로젝트에서 사용
 
 ```bash
-cd /path/to/srope
+cd /path/to/your-project
 
 # 팀과 함께 커밋할 복사 설치
 /path/to/ai-sdlc-skills/bin/install.sh . --mode copy
@@ -73,7 +73,7 @@ $ai-sdlc-skills-pipeline 주식자동매매 만들어줘
 ```
 
 Codex가 저장소의 `.agents/skills`를 탐색하므로 설치 결과는
-`srope/.agents/skills/ai-sdlc-skills-*`에 위치한다.
+`your-project/.agents/skills/ai-sdlc-skills-*`에 위치한다.
 
 ## 검증
 
