@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI SDLC Pipeline"
+  short_description: "기능 요청을 분석부터 배포 준비까지 실행"
+  default_prompt: "Use $ai-sdlc-skills-pipeline to deliver this feature through the full evidence-based pipeline."
