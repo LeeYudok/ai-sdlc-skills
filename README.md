@@ -38,6 +38,7 @@
 새 세션에서 그 문서부터 읽어 재개한다.
 
 스킬별 입력/출력 한눈에 보려면 [docs/REFERENCE.md](docs/REFERENCE.md) 참고.
+설계 결정·비목표·불변 제약은 [CONTEXT.md](CONTEXT.md) 에 고정돼 있다 — 세션 시작 시 먼저 읽는다.
 
 CodeGraph, Graphify, Code-Graph-RAG, OpenCodeReview가 설치되고 사용 승인을 받은 환경에서는
 각 도구를 선택적으로 활용한다. 도구가 없어도 Git·소스·스키마·테스트 기반 폴백으로
