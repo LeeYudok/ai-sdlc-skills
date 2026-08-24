@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
-# Pre-commit verification. Exits 2 to block the commit on failure.
-# Stack presets append build/test verification to the STACK CHECKS section below.
+# PreToolUse(Bash) hook. Runs only when the command is a `git commit`;
+# blocks (exit 2) if a .env-type file is staged. Wired in .claude/settings.json.
 set -euo pipefail
 
-# --- Common: first line of defense against leaking secrets ---
-staged=$(git diff --cached --name-only)
+input=$(cat 2>/dev/null || true)
+case "$input" in
+  *"git commit"*|*"git -C"*commit*) ;;
+  *) exit 0 ;;
+esac
+
+repo="${CLAUDE_PROJECT_DIR:-$PWD}"
+staged=$(git -C "$repo" diff --cached --name-only 2>/dev/null || true)
 if printf '%s\n' "$staged" | grep -qE '(^|/)\.env($|\.)'; then
   echo "Blocked: a .env-type file is staged. Commit is not allowed." >&2
   exit 2
 fi
-
-# --- STACK CHECKS (presets append here) ---
-
-echo "pre-commit 통과"
 exit 0

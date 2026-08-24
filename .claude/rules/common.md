@@ -29,13 +29,13 @@
 
 ## P2 — 권장
 
-- 함수 인지 복잡도(CC) 15 이하 (`cc-check.py` 경고).
+- 함수 인지 복잡도(CC) 15 이하.
 - 파일 300줄 초과 시 분리 검토.
 - TODO/FIXME 에 이슈 번호 병기.
 
 ## 보안
 
-- settings.json `deny`로 `.env` read·`rm -rf`·force push 차단됨. allow 추가는 신중히(self-permission 게이트).
+- 자동 차단은 `.claude/hooks/pre-commit.sh`(`.env` 스테이징, `settings.json` 배선) 하나뿐. 그 외 P0 는 규율이다.
 - `curl` `-v`/`-sv` 금지 — 헤더에 시크릿 노출됨. `--silent` + status code만.
 
 ## 소통
