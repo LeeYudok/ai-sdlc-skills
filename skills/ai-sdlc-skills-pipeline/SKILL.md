@@ -26,6 +26,8 @@ Read [references/artifact-contract.md](references/artifact-contract.md) before s
 
 Invoke a named phase skill when available. If it is unavailable, perform that phase using the same artifact contract rather than silently skipping it.
 
+After `complete`, `ai-sdlc-skills-commit` and `ai-sdlc-skills-pr` are optional, user-triggered delivery steps — not part of the gated stage machine. Run `ai-sdlc-skills-commit` only when the user asks to commit the change (local-only, never pushes on its own), and `ai-sdlc-skills-pr` only when the user asks to open it for review (pushes the branch and drafts the PR/MR, never merges).
+
 ## Gates
 
 - Never write product code before analysis, impact, and specification artifacts pass their gates.

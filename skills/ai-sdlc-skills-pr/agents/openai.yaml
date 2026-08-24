@@ -1,0 +1,4 @@
+interface:
+  display_name: "Open Pull Request"
+  short_description: "커밋 범위를 분석해 PR/MR 제목·본문 작성 후 오픈"
+  default_prompt: "Use $ai-sdlc-skills-pr to open a pull request for the current branch."
