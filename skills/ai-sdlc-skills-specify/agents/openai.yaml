@@ -1,0 +1,4 @@
+interface:
+  display_name: "Feature Specification"
+  short_description: "분석 근거를 테스트 가능한 기능 명세로 변환"
+  default_prompt: "Use $ai-sdlc-skills-specify to create a testable specification for this feature."

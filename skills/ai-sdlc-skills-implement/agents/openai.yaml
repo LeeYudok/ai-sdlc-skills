@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specification Implementation"
+  short_description: "승인된 기능 명세를 추적 가능하게 구현"
+  default_prompt: "Use $ai-sdlc-skills-implement to implement the approved feature specification."

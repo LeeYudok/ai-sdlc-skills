@@ -1,0 +1,4 @@
+interface:
+  display_name: "Change Verification"
+  short_description: "요구사항·회귀·운영 신호를 종합 검증"
+  default_prompt: "Use $ai-sdlc-skills-verify to verify this implementation against its acceptance criteria."

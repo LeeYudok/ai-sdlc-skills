@@ -1,0 +1,4 @@
+interface:
+  display_name: "Change Evidence"
+  short_description: "그래프·리뷰·소스 증거를 교차검증해 영향도 보강"
+  default_prompt: "Use $ai-sdlc-skills-evidence to collect independent blast-radius evidence for this change."
