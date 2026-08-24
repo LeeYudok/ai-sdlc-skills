@@ -48,7 +48,7 @@ export AI_SDLC_LLM_MODEL=<model>
 키와 내부 URL은 저장소나 생성 문서에 기록하지 않는다. 모델 공급자가 없어도 로컬 분석,
 결정적 검사, QA, 로컬 배포 단계는 동작한다.
 
-## your-project에서 사용
+## 대상 프로젝트에서 사용
 
 ```bash
 cd /path/to/your-project
