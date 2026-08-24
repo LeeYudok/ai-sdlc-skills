@@ -9,6 +9,10 @@ Build a verification matrix from every `AC-*`, business rule, and material impac
 
 When OpenCodeReview or another approved independent reviewer is available, review the feature diff and reconcile its findings with the verification matrix. Never let an LLM review replace deterministic build, test, security, or migration checks.
 
+Detect the repository's primary language from its manifest (`go.mod`, `pyproject.toml`/`requirements.txt`/`setup.py`, `package.json` with TypeScript, or `Cargo.toml`) and read the matching guide under [references/reviews/](references/reviews/) before finalizing the matrix; a polyglot repository loads every guide whose manifest is present. Check its criteria in addition to the acceptance criteria.
+
+Independence: perform verification in a fresh context or session separate from the one that implemented the change whenever that is available to you. When the same session did both, record in `qa-report.md` that verification was self-reviewed rather than independent — this is weaker evidence and is a residual risk, not a gap to silently accept.
+
 Cover as applicable:
 
 - focused unit/component tests and the relevant regression suite;

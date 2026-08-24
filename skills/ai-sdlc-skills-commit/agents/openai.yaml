@@ -1,0 +1,4 @@
+interface:
+  display_name: "Conventional Commit"
+  short_description: "작업 트리를 논리적 conventional commit으로 기록(로컬 전용)"
+  default_prompt: "Use $ai-sdlc-skills-commit to commit the current working tree."
