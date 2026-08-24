@@ -10,6 +10,7 @@ done
 python3 -m py_compile "$ROOT/skills/ai-sdlc-skills-pipeline/scripts/pipeline_state.py"
 python3 -m py_compile "$ROOT/skills/ai-sdlc-skills-pipeline/scripts/provider_config.py"
 python3 -m py_compile "$ROOT/skills/ai-sdlc-skills-evidence/scripts/detect_tools.py"
+python3 -m py_compile "$ROOT/skills/ai-sdlc-skills-handoff/scripts/handoff.py"
 
 SANDBOX="$(mktemp -d /tmp/ai-sdlc-skills-test.XXXXXX)"
 trap 'rm -rf "$SANDBOX"' EXIT
@@ -105,5 +106,28 @@ case "$vllm_report" in
     exit 1
     ;;
 esac
+
+HANDOFF_SCRIPT="$ROOT/skills/ai-sdlc-skills-handoff/scripts/handoff.py"
+handoff_file="$(python3 "$HANDOFF_SCRIPT" write --root "$SANDBOX" --run stock-auto-trading)"
+[ "$handoff_file" = "$(cd "$SANDBOX" && pwd -P)/.ai-sdlc/runs/stock-auto-trading/HANDOFF.md" ] || {
+  echo "Handoff written to unexpected path: $handoff_file" >&2
+  exit 1
+}
+grep -q '주식자동매매 만들어줘' "$handoff_file" || { echo "Handoff did not carry the original request" >&2; exit 1; }
+grep -q 'Pipeline stage: `complete`' "$handoff_file" || { echo "Handoff did not carry the pipeline stage" >&2; exit 1; }
+if python3 "$HANDOFF_SCRIPT" check --root "$SANDBOX" --run stock-auto-trading >/dev/null 2>&1; then
+  echo "Handoff check passed with unfilled markers" >&2
+  exit 1
+fi
+sed -i.bak 's/<!-- FILL -->//g' "$handoff_file" && rm -f "$handoff_file.bak"
+python3 "$HANDOFF_SCRIPT" check --root "$SANDBOX" --run stock-auto-trading >/dev/null
+printf '%s
+' 'api_key = abcdefghijklmnop1234' >> "$handoff_file"
+if python3 "$HANDOFF_SCRIPT" check --root "$SANDBOX" --run stock-auto-trading >/dev/null 2>&1; then
+  echo "Handoff check accepted a secret-looking value" >&2
+  exit 1
+fi
+adhoc_file="$(python3 "$HANDOFF_SCRIPT" write --root "$SANDBOX")"
+[ "$adhoc_file" = "$(cd "$SANDBOX" && pwd -P)/.ai-sdlc/HANDOFF.md" ] || { echo "Ad-hoc handoff path wrong: $adhoc_file" >&2; exit 1; }
 
 echo "All tests passed"

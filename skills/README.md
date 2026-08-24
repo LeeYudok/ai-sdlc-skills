@@ -28,3 +28,4 @@
 |---|---|
 | [ai-sdlc-skills-commit](ai-sdlc-skills-commit/SKILL.md) | 로컬 conventional commit — push 하지 않음 |
 | [ai-sdlc-skills-pr](ai-sdlc-skills-pr/SKILL.md) | PR/MR 오픈 — 머지하지 않음 |
+| [ai-sdlc-skills-handoff](ai-sdlc-skills-handoff/SKILL.md) | 컨텍스트 소진 전 `HANDOFF.md` 상태 스냅샷 작성·검증, 새 세션 재개 |

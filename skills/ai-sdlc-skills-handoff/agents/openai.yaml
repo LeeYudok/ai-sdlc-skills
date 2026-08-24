@@ -1,0 +1,4 @@
+interface:
+  display_name: "Session Handoff"
+  short_description: "컨텍스트 소진 전 상태 스냅샷(HANDOFF.md) 작성·검증, 새 세션에서 재개"
+  default_prompt: "Use $ai-sdlc-skills-handoff to write a HANDOFF.md for the current run, or to resume from an existing one."

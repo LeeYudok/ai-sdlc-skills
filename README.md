@@ -27,6 +27,10 @@
 `ai-sdlc-skills-pr`(PR/MR 오픈)을 실행한다 — 둘 다 게이트 상태머신 밖의 독립 단계이며
 자동으로 커밋·푸시·머지하지 않는다.
 
+긴 실행이 한 세션의 컨텍스트 윈도우를 넘길 때는 `ai-sdlc-skills-handoff`로
+`HANDOFF.md` 상태 스냅샷(목표·현재 상태·결정·남은 일·함정·재개 절차)을 남기고
+새 세션에서 그 문서부터 읽어 재개한다.
+
 스킬별 입력/출력 한눈에 보려면 [docs/REFERENCE.md](docs/REFERENCE.md) 참고.
 
 CodeGraph, Graphify, Code-Graph-RAG, OpenCodeReview가 설치되고 사용 승인을 받은 환경에서는

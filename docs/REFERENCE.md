@@ -23,6 +23,7 @@ One row per skill: when to invoke it, what it reads, and what it writes under `.
 |---|---|---|
 | `ai-sdlc-skills-commit` | The user asks to commit the change | one or more local conventional commits; never pushes |
 | `ai-sdlc-skills-pr` | The user asks to open the change for review | pushes the branch if needed, opens a PR/MR; never merges |
+| `ai-sdlc-skills-handoff` | Context usage nears ~40–50%, or the user asks to hand off / resume | `HANDOFF.md` state snapshot (goal, state, decisions, remaining work, traps, resume command, files to load); `check` blocks on unfilled markers |
 
 ## Stage gate order
 
