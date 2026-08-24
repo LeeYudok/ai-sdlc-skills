@@ -18,7 +18,8 @@ All paths are relative to the consumer repository.
     ├── implementation-report.md
     ├── qa-report.md
     ├── local-deploy-report.md
-    └── release-plan.md
+    ├── release-plan.md
+    └── HANDOFF.md          (optional; ai-sdlc-skills-handoff)
 ```
 
 ## Invariants
@@ -33,4 +34,5 @@ All paths are relative to the consumer repository.
 
 ## Resume rule
 
+If `HANDOFF.md` exists in the run directory, read it first and follow its resume procedure before anything else.
 Read `state.json`, verify the current commit and dirty worktree, and revalidate any completed phase affected by code changes since its recorded update. Resume at the first incomplete or invalidated phase.
