@@ -6,28 +6,11 @@
 이 파일은 **자체 완결**이어야 한다 — 아래 P0/P1 은 다른 파일 로딩 없이 여기서 읽힌다.
 `@` import 같은 특정 하네스 전용 문법은 여기에 두지 않는다.
 
-## 메모리 경로 오버라이드
+## 메모리·하네스
 
-이 프로젝트의 auto-memory SSOT는 `.claude/memory/` 이다.
-- 시스템 기본 경로(`~/.claude/projects/.../memory/`)는 사용하지 않는다.
-- 모든 메모리 읽기/쓰기는 `.claude/memory/` 하위에서 수행한다.
-- `MEMORY.md` 가 인덱스(단일), 타입접두 `project_`/`feedback_`/`reference_`/`user_`.
-- `user_*.md` 만 개인(gitignore), 그 외는 팀 공유.
-
-## .claude/ 인프라
-
-개요는 [.claude/README.md](.claude/README.md), 각 하위 디렉터리 README 에 작성 골격과
-컨벤션이 있다.
-
-| 디렉터리 | 역할 | 상세 |
-| :--- | :--- | :--- |
-| `hooks/` | 강제 게이트 — pre-commit, 자동 포맷, observe-lite, 메모리 리마인드 | [README](.claude/hooks/README.md) |
-| `memory/` | 프로젝트 메모리 SSOT — MEMORY.md 인덱스 + 타입접두 파일 | [README](.claude/memory/README.md) |
-| `rules/` | 맥락 인지 룰 — `paths:` 스코프 조건부 로드 | [README](.claude/rules/README.md) |
-| `skills/` | 상황별 절차 — review, status, search-first, memory-factcheck, security-precheck, docs-sync, grill-me 등 | [README](.claude/skills/README.md) |
-| `scripts/` | 레포 로컬 헬퍼 — knowledge_graph.py(문서 그래프 + 링크 체커) | [README](.claude/scripts/README.md) |
-
-문서 정합성 점검·온보딩은 `python3 .claude/scripts/knowledge_graph.py --check` 실행.
+- 프로젝트 메모리 SSOT 는 `.claude/memory/`(`MEMORY.md` 인덱스). 시스템 기본 메모리 경로는 쓰지 않는다.
+- `.claude/` 는 **동작하는 최소**만 둔다 (#14): `rules/`(스코프 룰), `hooks/pre-commit.sh`(`.env` 스테이징 차단, `settings.json` 에 배선), `memory/`. 설명만 있고 배선되지 않은 훅·스크립트·스킬을 두지 않는다.
+- 설계 결정·비목표·세션 시작 시 읽을 파일은 [CONTEXT.md](CONTEXT.md).
 
 ## 프로젝트 개요
 
@@ -43,9 +26,8 @@ SDLC 스킬 모음.
 
 ## 명령
 
-- 전체 검증: `tests/test.sh`
-- 스킬 검증: `python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py <skill-dir>`
-- 문서 링크 검사: `python3 .claude/scripts/knowledge_graph.py --check`
+- 전체 검증: `tests/test.sh` (스킬 frontmatter·설치·상태머신·핸드오프 포함)
+- 스킬 단독 검증: `python3 tests/validate_skill.py <skill-dir>`
 
 ## 컨벤션
 
@@ -74,20 +56,20 @@ P0 위반 시 즉시 작업 중단 + 사용자 에스컬레이션.
 ### P1 — 필수 (AI 자율 실행 범위, 위반 시 PR 차단)
 
 - 이슈 번호를 브랜치명·커밋·PR/MR 제목에 반드시 포함
-- 커밋 전 타입체크·린트 통과 (`.claude/hooks/pre-commit.sh` 자동 게이트)
+- 커밋 전 `tests/test.sh` 통과. `.env` 스테이징은 `.claude/hooks/pre-commit.sh` 가 자동 차단하고, 나머지는 규율
 - 새 기능에 최소 1개 테스트 동반
 - `main`/`develop` 직접 커밋 금지 → 항상 feature/fix/chore 브랜치
 
 ### P2 — 권장 (리뷰 지적 사항, 예외 협의 가능)
 
-- 함수당 인지 복잡도(CC) 15 이하 (`.claude/hooks/cc-check.py` 경고)
+- 함수당 인지 복잡도(CC) 15 이하
 - 파일 1개 = 단일 책임 (300줄 초과 시 분리 검토)
 - TODO/FIXME 에 이슈 번호 병기
 
 ## 워크플로
 
 1. **이슈 등록** → 2. **브랜치 생성** (`feat/issue-<N>-<slug>`) → 3. **구현** →
-4. **pre-commit 자동 게이트 통과** → 5. **PR/MR 생성** → 6. **리뷰** → 7. **머지 + 이슈 클로즈**
+4. **`tests/test.sh` 통과** → 5. **PR/MR 생성** → 6. **리뷰** → 7. **머지 + 이슈 클로즈**
 
 이슈 클로즈 규약은 forge 별로 다르다 → `.claude/rules/forge.md` 참조.
 GitHub = PR 본문 `Closes #N` 으로 머지 시 자동 클로즈. GitLab 19 = `Closes #N` 자동 클로즈 실측 동작 — 단 머지 후 `glab issue view <N>` 로 확인하고, `opened` 로 남은 경우에만 수동 클로즈.
