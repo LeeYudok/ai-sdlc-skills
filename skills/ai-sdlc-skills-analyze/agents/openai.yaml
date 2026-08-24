@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repository Analysis"
+  short_description: "기능 변경 전 저장소 구조와 흐름 분석"
+  default_prompt: "Use $ai-sdlc-skills-analyze to analyze this repository for the requested change."

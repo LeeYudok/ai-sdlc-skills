@@ -1,0 +1,4 @@
+interface:
+  display_name: "Business Analysis"
+  short_description: "버그·기능 요청을 근거 기반 BA 문서로 정리"
+  default_prompt: "Use $ai-sdlc-skills-ba to create a BA document for this requested change."

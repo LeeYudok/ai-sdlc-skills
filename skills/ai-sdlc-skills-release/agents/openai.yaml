@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release Readiness"
+  short_description: "무중단 운영 배포 계획과 롤백 준비 검증"
+  default_prompt: "Use $ai-sdlc-skills-release to assess production release readiness for this change."
