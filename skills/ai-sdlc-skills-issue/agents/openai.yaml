@@ -1,0 +1,4 @@
+interface:
+  display_name: "Issue Intake"
+  short_description: "이슈 번호·기획서에서 forge 이슈 확보, <type>/issue-N-<slug> 브랜치와 run slug 고정"
+  default_prompt: "Use $ai-sdlc-skills-issue to resolve or create the issue for this change and prepare its branch."

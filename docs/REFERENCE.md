@@ -7,6 +7,7 @@ One row per skill: when to invoke it, what it reads, and what it writes under `.
 | Skill | Use when | Writes |
 |---|---|---|
 | `ai-sdlc-skills-pipeline` | End-to-end request from a user, start to finish | drives the run state, delegates to every skill below |
+| `ai-sdlc-skills-issue` | At the start of an issue-first change: issue number or spec path → forge issue, `<type>/issue-N-<slug>` branch, run slug | run `state.json` (init) — no artifact of its own |
 | `ai-sdlc-skills-analyze` | Before specifying or implementing a non-trivial change | `repository-analysis.md` |
 | `ai-sdlc-skills-evidence` | After analysis, to cross-check with graph/RAG/review tools | `evidence-ledger.md` |
 | `ai-sdlc-skills-ba` | Before technical specification and coding | `ba.md` |

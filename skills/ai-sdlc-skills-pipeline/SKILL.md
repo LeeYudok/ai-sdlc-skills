@@ -11,7 +11,8 @@ Read [references/artifact-contract.md](references/artifact-contract.md) before s
 
 ## Pipeline
 
-1. Create a stable kebab-case run slug. If its state already exists, inspect and resume it; otherwise initialize the run:
+0. If the repository requires issue-first work, or the user hands over an issue number or a spec document, run `ai-sdlc-skills-issue` first. It yields the issue, the `<type>/issue-N-<slug>` branch, and the run slug `issue-N-<slug>` — use that slug in step 1 instead of inventing one.
+1. Create a stable kebab-case run slug (skip if step 0 supplied one). If its state already exists, inspect and resume it; otherwise initialize the run:
    `python3 <this-skill-dir>/scripts/pipeline_state.py init --root <repo> --run <slug> --request <request>`.
 2. Run `ai-sdlc-skills-analyze`. Advance to `analyzed` only when the repository evidence is current.
 3. Run `ai-sdlc-skills-evidence` to cross-check source inspection with any approved graph, RAG, and review tools. Advance to `evidence_collected` only when gaps and contradictions are recorded.
