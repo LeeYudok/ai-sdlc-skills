@@ -1,0 +1,4 @@
+interface:
+  display_name: "Local Deployment"
+  short_description: "격리된 로컬 환경에 배포하고 핵심 흐름 검증"
+  default_prompt: "Use $ai-sdlc-skills-local-deploy to deploy and smoke-test this verified change locally."

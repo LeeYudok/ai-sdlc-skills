@@ -1,0 +1,4 @@
+interface:
+  display_name: "Full Impact Analysis"
+  short_description: "변경의 전체 시스템·운영 영향도 평가"
+  default_prompt: "Use $ai-sdlc-skills-impact to assess the full impact of this proposed change."
