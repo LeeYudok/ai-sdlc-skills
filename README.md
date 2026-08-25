@@ -84,17 +84,25 @@ cd /path/to/your-project
 /path/to/ai-sdlc-skills/bin/install.sh . --mode link
 ```
 
+이 파이프라인은 운영 중인 **기존 저장소**의 변경 요청만 다룬다. 빈 저장소에 새 시스템을
+처음부터 만들어 달라는 그린필드 생성 요청은 지원하지 않는다 — 비목표는
+[CONTEXT.md](CONTEXT.md) 참고.
+
 Codex를 다시 시작한 뒤 자연어로 요청한다.
 
 ```text
-주식자동매매 만들어줘
+주문 목록 API가 취소된 주문을 필터링하지 못한다. status 파라미터를 추가해서
+취소 상태를 걸러낼 수 있게 해줘.
 ```
 
 명시적으로 호출하려면:
 
 ```text
-$ai-sdlc-skills-pipeline 주식자동매매 만들어줘
+$ai-sdlc-skills-pipeline 주문 목록 API가 취소된 주문을 필터링하지 못한다. status 파라미터를 추가해줘.
 ```
+
+이런 요청은 기존 API 핸들러·쿼리 로직을 근거로 분석 → 영향도(호출부·클라이언트 호환성) →
+명세 → 구현 순으로 자연스럽게 이어진다.
 
 Codex가 저장소의 `.agents/skills`를 탐색하므로 설치 결과는
 `your-project/.agents/skills/ai-sdlc-skills-*`에 위치한다.
