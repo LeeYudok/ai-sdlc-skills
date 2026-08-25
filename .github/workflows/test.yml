@@ -1,0 +1,25 @@
+name: test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # 저장소 스크립트는 표준 라이브러리만 사용하며 특정 3.9+ 기능에
+          # 의존하지 않는다. 3.11을 최소 지원 버전으로 고정한다.
+          python-version: "3.11"
+
+      - name: Run tests/test.sh
+        run: bash tests/test.sh

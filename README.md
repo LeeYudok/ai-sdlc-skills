@@ -112,3 +112,6 @@ Codex가 저장소의 `.agents/skills`를 탐색하므로 설치 결과는
 ```bash
 tests/test.sh
 ```
+
+pull request와 `main` 대상 push마다 GitHub Actions가 동일한 `tests/test.sh`를
+실행한다 (`.github/workflows/test.yml`). 필수 CI check 이름은 **`test`**.
