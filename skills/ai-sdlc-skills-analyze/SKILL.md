@@ -25,3 +25,5 @@ Also update `.ai-sdlc/context/repository.md` only with reusable facts, stamped w
 Where boundaries are weak, do not open with a restructuring proposal. Pin the current behavior with tests or observability first, so a later change has something to be judged against.
 
 This phase is read-only except for its analysis artifacts. Do not implement the feature.
+
+End `repository-analysis.md` with a machine-readable gate verdict line — `Verdict: PASS` when the analysis is current and no blocking unknown remains, otherwise `Verdict: BLOCKED` naming the unknown and how it would be verified. `pipeline_state.py` reads this line to allow or block the `analyzed` transition; the last such line in the file wins.

@@ -64,9 +64,30 @@ if python3 "$STATE_SCRIPT" advance --root "$SANDBOX" --run stock-auto-trading --
   exit 1
 fi
 
-for artifact in repository-analysis.md evidence-ledger.md ba.md impact-analysis.md feature-spec.md implementation-plan.md implementation-report.md qa-report.md local-deploy-report.md release-plan.md; do
-  printf '%s\n' "test evidence" > "$SANDBOX/.ai-sdlc/runs/stock-auto-trading/$artifact"
-done
+# 산출물은 단계별 허용 verdict 를 담아야 게이트를 통과한다 (#24).
+write_artifact() { printf '# report\n\ntest evidence\n\nVerdict: %s\n' "$2" > "$1"; }
+write_run_artifacts() {
+  run_path="$SANDBOX/.ai-sdlc/runs/$1"
+  write_artifact "$run_path/repository-analysis.md" "${2:-PASS}"
+  write_artifact "$run_path/evidence-ledger.md" "${2:-PASS}"
+  write_artifact "$run_path/ba.md" "${2:-READY}"
+  write_artifact "$run_path/impact-analysis.md" "${2:-PASS_WITH_RESIDUAL_RISK}"
+  write_artifact "$run_path/feature-spec.md" "${2:-READY}"
+  write_artifact "$run_path/implementation-plan.md" "${2:-READY}"
+  write_artifact "$run_path/implementation-report.md" "${2:-PASS}"
+  write_artifact "$run_path/qa-report.md" "${2:-PASS}"
+  write_artifact "$run_path/local-deploy-report.md" "${2:-PASS}"
+  write_artifact "$run_path/release-plan.md" "${2:-READY_WITH_EXPLICIT_RISK_ACCEPTANCE}"
+}
+
+# 산출물이 있어도 verdict 줄이 없으면 전이를 막는다 (NOT_RUN 취급).
+printf '%s\n' "test evidence" > "$SANDBOX/.ai-sdlc/runs/stock-auto-trading/repository-analysis.md"
+if python3 "$STATE_SCRIPT" advance --root "$SANDBOX" --run stock-auto-trading --stage analyzed >/dev/null 2>&1; then
+  echo "State machine advanced with an artifact that carries no verdict line" >&2
+  exit 1
+fi
+
+write_run_artifacts stock-auto-trading
 
 for stage in analyzed evidence_collected ba_ready impact_assessed specified implemented verified local_deployed release_ready complete; do
   python3 "$STATE_SCRIPT" advance --root "$SANDBOX" --run stock-auto-trading --stage "$stage" >/dev/null
@@ -81,6 +102,9 @@ state = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 assert state["status"] == "complete"
 assert state["stage"] == "complete"
 assert len(state["completed_stages"]) == 11
+advanced = [entry for entry in state["history"] if entry["event"].startswith("advanced:")]
+assert advanced[0]["artifact_verdicts"] == {"repository-analysis.md": "PASS"}
+assert advanced[3]["artifact_verdicts"] == {"impact-analysis.md": "PASS_WITH_RESIDUAL_RISK"}
 PY
 
 run_dir="$SANDBOX/.ai-sdlc/runs/stock-auto-trading"
@@ -95,6 +119,46 @@ from pathlib import Path
 
 json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 PY
+
+# 회귀 (#24): 모든 산출물이 BLOCKED 면 어떤 단계도 전이되지 않고 complete 에 닿지 못한다.
+python3 "$STATE_SCRIPT" init --root "$SANDBOX" --run blocked-artifacts --request "blocked artifacts" >/dev/null
+write_run_artifacts blocked-artifacts BLOCKED
+for stage in analyzed evidence_collected ba_ready impact_assessed specified implemented verified local_deployed release_ready complete; do
+  if python3 "$STATE_SCRIPT" advance --root "$SANDBOX" --run blocked-artifacts --stage "$stage" >/dev/null 2>&1; then
+    echo "State machine advanced to $stage with a BLOCKED artifact" >&2
+    exit 1
+  fi
+done
+python3 - "$SANDBOX/.ai-sdlc/runs/blocked-artifacts/state.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+state = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+assert state["stage"] == "initialized", state["stage"]
+assert state["status"] == "running", state["status"]
+assert state["completed_stages"] == ["initialized"], state["completed_stages"]
+PY
+
+# 회귀 (#24): 다른 단계에서는 통과하는 verdict 라도 그 단계에서 허용되지 않으면 막힌다.
+python3 "$STATE_SCRIPT" init --root "$SANDBOX" --run wrong-verdict --request "wrong verdict" >/dev/null
+write_run_artifacts wrong-verdict
+write_artifact "$SANDBOX/.ai-sdlc/runs/wrong-verdict/ba.md" PASS
+python3 "$STATE_SCRIPT" advance --root "$SANDBOX" --run wrong-verdict --stage analyzed >/dev/null
+python3 "$STATE_SCRIPT" advance --root "$SANDBOX" --run wrong-verdict --stage evidence_collected >/dev/null
+if python3 "$STATE_SCRIPT" advance --root "$SANDBOX" --run wrong-verdict --stage ba_ready >/dev/null 2>&1; then
+  echo "State machine accepted PASS where the ba_ready gate requires READY" >&2
+  exit 1
+fi
+
+# 회귀 (#24): verdict 줄이 여러 개면 마지막 줄이 결정한다 — 갱신된 BLOCKED 가 이긴다.
+printf '# ba\n\nVerdict: READY\n\n## update\n\nVerdict: BLOCKED\n' > "$SANDBOX/.ai-sdlc/runs/wrong-verdict/ba.md"
+if python3 "$STATE_SCRIPT" advance --root "$SANDBOX" --run wrong-verdict --stage ba_ready >/dev/null 2>&1; then
+  echo "State machine used a stale verdict instead of the last one" >&2
+  exit 1
+fi
+printf '# ba\n\nVerdict: BLOCKED\n\n## update\n\nVerdict: READY\n' > "$SANDBOX/.ai-sdlc/runs/wrong-verdict/ba.md"
+python3 "$STATE_SCRIPT" advance --root "$SANDBOX" --run wrong-verdict --stage ba_ready >/dev/null
 
 if "$ROOT/bin/install.sh" "$SANDBOX" --mode copy >/dev/null 2>&1; then
   echo "Installer unexpectedly overwrote existing skills" >&2
