@@ -58,6 +58,19 @@ assert state["stage"] == "complete"
 assert len(state["completed_stages"]) == 11
 PY
 
+run_dir="$SANDBOX/.ai-sdlc/runs/stock-auto-trading"
+if find "$run_dir" -maxdepth 1 -name 'state.json.tmp' | grep -q .; then
+  echo "Leftover temp file found after save()" >&2
+  exit 1
+fi
+python3 - "$run_dir/state.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+PY
+
 if "$ROOT/bin/install.sh" "$SANDBOX" --mode copy >/dev/null 2>&1; then
   echo "Installer unexpectedly overwrote existing skills" >&2
   exit 1

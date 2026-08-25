@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 from datetime import datetime, timezone
@@ -71,10 +72,13 @@ def load(root: Path, run: str) -> dict:
 
 def save(root: Path, run: str, state: dict) -> None:
     path = state_path(root, run)
-    path.write_text(
-        json.dumps(state, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    payload = json.dumps(state, ensure_ascii=False, indent=2) + "\n"
+    temp_path = path.with_name(path.name + ".tmp")
+    with temp_path.open("w", encoding="utf-8") as handle:
+        handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(temp_path, path)
 
 
 def init(args: argparse.Namespace) -> None:
