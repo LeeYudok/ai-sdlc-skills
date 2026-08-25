@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 
 "$ROOT/tests/test_harness.sh"
+"$ROOT/tests/test_hook.sh"
 
 for skill in "$ROOT"/skills/ai-sdlc-skills-*; do
   python3 "$ROOT/tests/validate_skill.py" "$skill"

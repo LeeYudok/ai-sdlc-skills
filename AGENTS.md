@@ -5,7 +5,7 @@
 ## 메모리·하네스
 
 - 프로젝트 메모리 SSOT 는 `.claude/memory/`(`MEMORY.md` 인덱스). 시스템 기본 메모리 경로는 쓰지 않는다.
-- `.claude/` 는 **동작하는 최소**만 둔다 (#14): `rules/`(스코프 룰), `hooks/pre-commit.sh`(`.env` 스테이징 차단, `settings.json` 에 배선), `memory/`. 설명만 있고 배선되지 않은 훅·스크립트·스킬을 두지 않는다.
+- `.claude/` 는 **동작하는 최소**만 둔다 (#14): `rules/`(스코프 룰), `hooks/pre-commit.sh`(커밋 대상 저장소의 `.env` 스테이징 차단, `settings.json` 에 배선), `memory/`. 설명만 있고 배선되지 않은 훅·스크립트·스킬을 두지 않는다.
 - 설계 결정·비목표·세션 시작 시 읽을 파일은 [CONTEXT.md](CONTEXT.md).
 
 ## 프로젝트 개요
@@ -24,6 +24,7 @@ SDLC 스킬 모음.
 
 - 전체 검증: `tests/test.sh` (스킬 frontmatter·설치·상태머신·핸드오프 포함)
 - 스킬 단독 검증: `python3 tests/validate_skill.py <skill-dir>`
+- 훅 회귀 테스트 단독 실행: `tests/test_hook.sh`
 
 ## 컨벤션
 
@@ -44,7 +45,7 @@ P0 위반 시 즉시 작업 중단 + 사용자 에스컬레이션.
 ### P1 — 필수 (AI 자율 실행 범위, 위반 시 PR 차단)
 
 - 이슈 번호를 브랜치명·커밋·PR/MR 제목에 반드시 포함
-- 커밋 전 `tests/test.sh` 통과. `.env` 스테이징은 `.claude/hooks/pre-commit.sh` 가 자동 차단하고, 나머지는 규율
+- 커밋 전 `tests/test.sh` 통과. `.env` 스테이징은 `.claude/hooks/pre-commit.sh` 가 커밋 대상 저장소의 index 를 검사해 자동 차단(대상 판별 불가 시 fail closed)하고, 나머지는 규율 — 보장 범위·한계는 `.claude/rules/common.md`
 - 새 기능에 최소 1개 테스트 동반
 - `main`/`develop` 직접 커밋 금지 → 항상 feature/fix/chore 브랜치
 
