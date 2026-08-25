@@ -23,11 +23,26 @@ Read [references/artifact-contract.md](references/artifact-contract.md) before s
 8. Run `ai-sdlc-skills-verify` as the QA gate. Fix and re-run failed checks up to two times when the fix stays within scope. Otherwise block the run with evidence. Advance to `verified` only on a passing verdict.
 9. Run `ai-sdlc-skills-local-deploy`. Advance to `local_deployed` only after an isolated local build, health check, and changed-flow smoke test pass.
 10. Run `ai-sdlc-skills-release`. Advance to `release_ready` only when backward compatibility, rollout, monitoring, abort thresholds, and rollback are evidenced. `release_ready` means a reviewed plan exists; it is not authorization to deploy.
-11. Advance to `complete` and report changed files, QA/local evidence, residual risks, and the explicit next action.
+11. Advance to `complete` and write the completion report. It states, or marks `N/A` with a reason: requirements delivered and explicitly excluded; impact on code, data, external services, and operational configuration; verifications run and the result of independent review; local deployment and live-check results; rollback/recovery procedure and residual risk; follow-up issues with their actual state in the tracker. If any required stage did not pass, do not report completion — report the stage that is stuck, the evidence that is missing, and the next action.
 
 Invoke a named phase skill when available. If it is unavailable, perform that phase using the same artifact contract rather than silently skipping it.
 
 After `complete`, `ai-sdlc-skills-commit` and `ai-sdlc-skills-pr` are optional, user-triggered delivery steps — not part of the gated stage machine. Run `ai-sdlc-skills-commit` only when the user asks to commit the change (local-only, never pushes on its own), and `ai-sdlc-skills-pr` only when the user asks to open it for review (pushes the branch and drafts the PR/MR, never merges).
+
+## Session and parallel work
+
+Treat the context budget as a signal, not a percentage: hand off when evidence already collected is
+being lost, when the same content is read repeatedly, or when the room left is not enough to implement
+and verify what remains. The ~40-50% mark is a reminder to check those signals, not the rule itself.
+Read a small file whole; read a large one by symbol or line range. For a complex change, an exploration
+session may end by recording target files, symbols, and unverified risks, leaving implementation to a
+fresh session that starts from that record.
+
+Split work across agents by what they would touch, not by what the modules are called: overlapping
+files, shared contracts, generated artifacts, migrations, and deployment order all make two tasks
+sequential even when they sit in different modules. Give each agent an explicit set of owned files,
+isolate conflicting work in separate worktrees, and run contract and regression checks before
+integrating. Whoever integrates should not be the agent that wrote the change.
 
 ## Gates
 

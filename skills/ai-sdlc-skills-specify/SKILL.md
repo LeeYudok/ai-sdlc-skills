@@ -14,8 +14,11 @@ The feature specification must include:
 - normal, boundary, failure, recovery, authorization, and concurrency behavior;
 - data/API/event changes and backward-compatibility requirements;
 - non-functional requirements, including availability and observability;
-- assumptions, resolved decisions, unresolved decisions, and residual risks.
+- assumptions, resolved decisions, unresolved decisions, and residual risks;
+- for each risk-bearing `AC-*`, how failure would be detected early and how the change is rolled back or recovered — prevention alone is not a complete acceptance criterion.
 
-The implementation plan maps each `AC-*` to affected components, intended changes, migration/flag strategy, and verification. Prefer incremental changes that remain safe while old and new versions coexist.
+The implementation plan maps each `AC-*` to affected components, intended changes, migration/flag strategy, and verification, and additionally states: the modules this change owns; the contracts and recorded decisions to read before starting; areas that must not change; the constraints that apply; and the executable command that demonstrates each acceptance criterion. If implementation turns out to require a change outside the owned modules, that is a stop-and-re-plan condition, not a judgement call at the keyboard. Prefer incremental changes that remain safe while old and new versions coexist.
+
+For a request to modernize or improve an existing interface, the default interpretation is visual and usability change only: authentication methods, routes, API contracts, guards, and post-login redirects stay as they are. Adding or removing an authentication method, or changing who can reach a route, is a separate decision to raise, not part of a redesign.
 
 Do not invent a material product decision merely to keep the pipeline moving. Mark the specification `READY` only when all blocking decisions are resolved and every acceptance criterion is objectively verifiable; otherwise mark it `BLOCKED` and ask the smallest necessary question.

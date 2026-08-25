@@ -17,6 +17,8 @@ Cover each applicable surface:
 - configuration, feature flags, environments, CI/CD, observability, alerts, runbooks, and support;
 - dependent services, clients, teams, and deployment ordering.
 
+When the change touches persistent data, also read [references/data-change.md](references/data-change.md).
+
 For every impact item record evidence, severity, likelihood, affected component, mitigation, validation method, owner when known, and whether it blocks implementation or release. Include both “change” and “no impact, because …” conclusions for high-risk surfaces so omissions are visible.
 
 End with an impact gate verdict: `PASS`, `BLOCKED`, or `PASS_WITH_RESIDUAL_RISK`. `BLOCKED` requires explicit unresolved questions or missing evidence. Do not reduce “whole-system impact” to a list of files.

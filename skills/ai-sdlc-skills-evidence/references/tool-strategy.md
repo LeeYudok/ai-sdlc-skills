@@ -11,6 +11,26 @@ These integrations are optional. Pin versions in controlled environments and rec
 | Code-Graph-RAG | mixed-language monorepo semantic queries and data flow | Opt-in for very large or cross-language repositories | Requires Docker, Memgraph, Qdrant, cmake, and ripgrep; shared graph lifecycle needs operator control |
 | OpenCodeReview | changed-line defects, security, concurrency, rule-based review | Post-implementation independent diff review | Configured mode may send changed code to an LLM; confirm data-residency policy first |
 
+## When to adopt a tool
+
+Repository size is not the trigger. Adopt when a bottleneck is observed and recorded:
+
+- related files are missed and found only after a defect;
+- the same exploration is repeated every session;
+- context is exhausted before implementation starts;
+- the full verification suite is too slow to run per change;
+- a small change ripples farther than expected;
+- ownership or approval for a change is unclear.
+
+Record a baseline before adopting and re-measure after: how often a search fails to find the right
+location, how long location takes, how long verification waits. Without the baseline there is no way
+to tell whether the tool helped.
+
+Semantic or vector search is a later stage, not a default. Reach for it only when the staged search
+above measurably misses relevant code, compare it against keyword search and a hybrid of both on the
+same questions, and measure recall, irrelevant context returned, latency, and index build/refresh
+cost before making it part of the workflow.
+
 ## Safe command patterns
 
 Use only commands supported by the installed version and capture concise results.

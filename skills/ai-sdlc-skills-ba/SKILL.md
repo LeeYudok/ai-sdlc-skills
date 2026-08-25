@@ -13,4 +13,4 @@ For a feature or change, document actors, business outcome, current and target p
 
 For every type, define scope, exclusions, assumptions, dependencies, data effects, availability expectations, numbered business rules (`BR-*`), and objectively testable acceptance criteria (`AC-*`). Link each material statement to user input or repository evidence.
 
-Mark the document `READY` only when implementation can proceed without inventing a product decision. Mark it `BLOCKED` and ask a focused question when behavior, money movement, data ownership, authorization, or compatibility is materially ambiguous.
+Mark the document `READY` only when implementation can proceed without inventing a product decision. Mark it `BLOCKED` and ask a focused question when behavior, money movement, data ownership, authorization, or compatibility is materially ambiguous. Ask only where interpretations would diverge in data, security, or operational outcome. Anything decidable from code, documentation, schema, configuration, or history is investigated, not asked — an avoidable question spends the user's attention on evidence you could have collected.
