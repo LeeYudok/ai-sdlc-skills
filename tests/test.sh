@@ -26,6 +26,31 @@ actual="$(find "$SANDBOX/.agents/skills" -mindepth 1 -maxdepth 1 -type d | wc -l
   exit 1
 }
 
+PYCACHE_SKILL="$(find "$ROOT/skills" -mindepth 1 -maxdepth 1 -type d -name 'ai-sdlc-skills-*' | head -n 1)"
+mkdir -p "$PYCACHE_SKILL/__pycache__"
+printf 'bytecode' > "$PYCACHE_SKILL/__pycache__/example.cpython-311.pyc"
+printf 'bytecode' > "$PYCACHE_SKILL/example.pyc"
+cleanup_pycache_fixture() {
+  rm -rf "$PYCACHE_SKILL/__pycache__" "$PYCACHE_SKILL/example.pyc"
+}
+trap 'cleanup_pycache_fixture; rm -rf "$SANDBOX"' EXIT
+
+PYCACHE_SANDBOX="$(mktemp -d /tmp/ai-sdlc-skills-pycache-test.XXXXXX)"
+git -C "$PYCACHE_SANDBOX" init -q
+"$ROOT/bin/install.sh" "$PYCACHE_SANDBOX" --mode copy >/dev/null
+installed_pycache_skill="$PYCACHE_SANDBOX/.agents/skills/$(basename "$PYCACHE_SKILL")"
+if [ -e "$installed_pycache_skill/__pycache__" ]; then
+  echo "install.sh copied a __pycache__ directory into the target repository" >&2
+  exit 1
+fi
+if find "$installed_pycache_skill" -name '*.pyc' | grep -q .; then
+  echo "install.sh copied a .pyc file into the target repository" >&2
+  exit 1
+fi
+cleanup_pycache_fixture
+rm -rf "$PYCACHE_SANDBOX"
+trap 'rm -rf "$SANDBOX"' EXIT
+
 STATE_SCRIPT="$ROOT/skills/ai-sdlc-skills-pipeline/scripts/pipeline_state.py"
 python3 "$STATE_SCRIPT" init --root "$SANDBOX" --run stock-auto-trading --request "주식자동매매 만들어줘" >/dev/null
 

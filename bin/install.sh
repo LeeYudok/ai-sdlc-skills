@@ -82,6 +82,8 @@ for source in "$SOURCE_ROOT"/ai-sdlc-skills-*; do
   destination="$DEST_ROOT/$name"
   if [ "$MODE" = "copy" ]; then
     cp -R "$source" "$destination"
+    find "$destination" -depth -name '__pycache__' -type d -exec rm -rf {} +
+    find "$destination" -name '*.pyc' -type f -delete
   else
     ln -s "$source" "$destination"
   fi
