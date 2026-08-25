@@ -22,3 +22,5 @@ The implementation plan maps each `AC-*` to affected components, intended change
 For a request to modernize or improve an existing interface, the default interpretation is visual and usability change only: authentication methods, routes, API contracts, guards, and post-login redirects stay as they are. Adding or removing an authentication method, or changing who can reach a route, is a separate decision to raise, not part of a redesign.
 
 Do not invent a material product decision merely to keep the pipeline moving. Mark the specification `READY` only when all blocking decisions are resolved and every acceptance criterion is objectively verifiable; otherwise mark it `BLOCKED` and ask the smallest necessary question.
+
+Record that decision as a machine-readable gate verdict line at the end of **both** `feature-spec.md` and `implementation-plan.md` — `Verdict: READY` or `Verdict: BLOCKED`. `pipeline_state.py` reads these lines to allow or block the `specified` transition; the last such line in each file wins.

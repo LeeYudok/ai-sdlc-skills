@@ -20,3 +20,5 @@ Build the deployable artifact, start the local stack, wait with a bounded timeou
 Write `.ai-sdlc/runs/<run>/local-deploy-report.md` with environment, artifact identity, sanitized commands, startup time, health results, smoke evidence mapped to `AC-*`, logs checked, limitations, and verdict.
 
 Use `PASS`, `FAIL`, or `BLOCKED`. Missing local infrastructure is `BLOCKED`, not a pass. Stop and clean up processes and disposable resources after verification unless the user explicitly asks to keep them running. Never deploy to shared development, staging, or production under the label “local”.
+
+Record that verdict as a machine-readable gate line at the end of `local-deploy-report.md` — `Verdict: PASS`, `Verdict: FAIL`, or `Verdict: BLOCKED`. `pipeline_state.py` reads this line to allow or block the `local_deployed` transition, and only `PASS` passes; the last such line in the file wins.

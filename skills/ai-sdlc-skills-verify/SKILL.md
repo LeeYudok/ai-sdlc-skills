@@ -30,3 +30,5 @@ Cover as applicable:
 Write `.ai-sdlc/runs/<run>/qa-report.md`. For every `AC-*` record command or procedure, result, and evidence. Distinguish `PASS`, `FAIL`, and `NOT_RUN`; a skipped or unavailable check is never a pass. Include environment limitations and residual risks.
 
 Return a `PASS` verdict only when all required checks pass. A failure may be fixed and re-run when the change remains in scope; otherwise return `BLOCKED` with the shortest actionable explanation. A narrowed, dependency-derived test selection is acceptable only when the dependency evidence is trustworthy for the changed area; a change to a shared module or contract runs the full regression suite. A green CI run is one piece of evidence, not a completion criterion.
+
+Record the overall QA verdict as a machine-readable gate line at the end of `qa-report.md` — `Verdict: PASS`, `Verdict: FAIL`, `Verdict: NOT_RUN`, or `Verdict: BLOCKED`. `pipeline_state.py` reads this line to allow or block the `verified` transition, and only `PASS` passes; the last such line in the file wins.

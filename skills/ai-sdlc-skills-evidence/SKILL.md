@@ -22,3 +22,5 @@ Write `.ai-sdlc/runs/<run>/evidence-ledger.md` with:
 Use at least two independent evidence lanes for high-risk claims. A second graph built from similar parsers is supporting evidence, not fully independent evidence. Confirm the final blast radius against exact source and executable tests.
 
 Do not auto-install tools, change agent configuration, start Docker services, upload repository content, or rebuild a costly index without repository policy or user authorization. Never run destructive cleanup such as a shared graph database `--clean` operation.
+
+End `evidence-ledger.md` with a machine-readable gate verdict line — `Verdict: PASS` when the blast radius is corroborated and every gap is recorded, otherwise `Verdict: BLOCKED` naming the unresolved disagreement. `pipeline_state.py` reads this line to allow or block the `evidence_collected` transition; the last such line in the file wins.

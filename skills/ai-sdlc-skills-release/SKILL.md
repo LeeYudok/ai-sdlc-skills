@@ -30,3 +30,5 @@ Block release readiness when any applicable condition holds:
 - required verification is failed or not run.
 
 Use `READY`, `READY_WITH_EXPLICIT_RISK_ACCEPTANCE`, or `BLOCKED`. Never describe deployment as risk-free or guaranteed. `READY_WITH_EXPLICIT_RISK_ACCEPTANCE` requires the user or accountable operator to accept the listed residual risk before deployment.
+
+Record that verdict as a machine-readable gate line at the end of `release-plan.md` — `Verdict: READY`, `Verdict: READY_WITH_EXPLICIT_RISK_ACCEPTANCE`, or `Verdict: BLOCKED`. `pipeline_state.py` reads this line to allow or block the `release_ready` transition; the last such line in the file wins.

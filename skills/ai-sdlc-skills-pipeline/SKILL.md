@@ -52,4 +52,6 @@ integrating. Whoever integrates should not be the agent that wrote the change.
 - For money movement, automated trading, credentials, or production data, require explicit authorization immediately before the external or irreversible action.
 - Do not claim zero downtime or production safety from unit tests alone. Base the release verdict on concrete architecture and operational evidence.
 
-Use `pipeline_state.py block` with a concise reason whenever a gate cannot pass. Do not mark later stages complete to make the run appear successful.
+Each stage's required artifact ends with a machine-readable `Verdict: <VERDICT>` line, and `pipeline_state.py advance` refuses the transition unless that verdict is in the stage's allowed set — `BLOCKED`, `FAIL`, `NOT_RUN`, and a missing line all block. The allowed verdicts per stage are in [references/artifact-contract.md](references/artifact-contract.md).
+
+Use `pipeline_state.py block` with a concise reason whenever a gate cannot pass. Do not mark later stages complete to make the run appear successful, and never edit a verdict line to something the evidence does not support.

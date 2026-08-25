@@ -33,4 +33,4 @@ initialized → analyzed → evidence_collected → ba_ready → impact_assessed
 specified → implemented → verified → local_deployed → release_ready → complete
 ```
 
-Each transition is validated by `skills/ai-sdlc-skills-pipeline/scripts/pipeline_state.py` against the required artifact for that stage — see `REQUIRED_ARTIFACTS` in that script for the authoritative mapping.
+Each transition is validated by `skills/ai-sdlc-skills-pipeline/scripts/pipeline_state.py` against the required artifact for that stage — see `REQUIRED_ARTIFACTS` in that script for the authoritative mapping. The artifact must also carry a `Verdict: <VERDICT>` line whose value is allowed for that stage (`ALLOWED_VERDICTS` in the same script); `BLOCKED`, `FAIL`, `NOT_RUN`, and a missing verdict block the transition. See `skills/ai-sdlc-skills-pipeline/references/artifact-contract.md#gate-verdicts`.

@@ -37,6 +37,22 @@ REQUIRED_ARTIFACTS = {
     "local_deployed": ["local-deploy-report.md"],
     "release_ready": ["release-plan.md"],
 }
+# Machine-readable gate verdict: the LAST line of an artifact matching
+# `Verdict: <TOKEN>` decides the gate. Allowed tokens are per stage; every other
+# token (BLOCKED, FAIL, NOT_RUN, ...) and a missing line block the transition.
+# Documented in references/artifact-contract.md (#24).
+VERDICT_PATTERN = re.compile(r"^Verdict:[ \t]*([A-Z][A-Z_]*)[ \t]*$", re.MULTILINE)
+ALLOWED_VERDICTS = {
+    "analyzed": ("PASS",),
+    "evidence_collected": ("PASS",),
+    "ba_ready": ("READY",),
+    "impact_assessed": ("PASS", "PASS_WITH_RESIDUAL_RISK"),
+    "specified": ("READY",),
+    "implemented": ("PASS",),
+    "verified": ("PASS",),
+    "local_deployed": ("PASS",),
+    "release_ready": ("READY", "READY_WITH_EXPLICIT_RISK_ACCEPTANCE"),
+}
 
 
 def now() -> str:
@@ -111,6 +127,39 @@ def init(args: argparse.Namespace) -> None:
     print(json.dumps(state, ensure_ascii=False, indent=2))
 
 
+def read_verdict(path: Path) -> str | None:
+    """Return the last `Verdict: <TOKEN>` token in the artifact, if any."""
+    matches = VERDICT_PATTERN.findall(path.read_text(encoding="utf-8", errors="replace"))
+    return matches[-1] if matches else None
+
+
+def gate_problems(root: Path, run: str, stage: str) -> list[str]:
+    """Report why the required artifacts of `stage` do not clear its gate."""
+    directory = run_dir(root, run)
+    allowed = ALLOWED_VERDICTS.get(stage, ())
+    expected = " | ".join(allowed)
+    problems = []
+    for artifact in REQUIRED_ARTIFACTS.get(stage, []):
+        path = directory / artifact
+        if not path.is_file() or path.stat().st_size == 0:
+            problems.append(f"{artifact}: missing or empty")
+            continue
+        verdict = read_verdict(path)
+        if verdict is None:
+            problems.append(f"{artifact}: no 'Verdict: <VERDICT>' line (expected {expected})")
+        elif verdict not in allowed:
+            problems.append(f"{artifact}: verdict {verdict} does not pass (expected {expected})")
+    return problems
+
+
+def stage_verdicts(root: Path, run: str, stage: str) -> dict:
+    directory = run_dir(root, run)
+    return {
+        artifact: read_verdict(directory / artifact)
+        for artifact in REQUIRED_ARTIFACTS.get(stage, [])
+    }
+
+
 def advance(args: argparse.Namespace) -> None:
     root = Path(args.root)
     state = load(root, args.run)
@@ -122,16 +171,12 @@ def advance(args: argparse.Namespace) -> None:
         raise SystemExit(
             f"invalid transition: {state['stage']} -> {args.stage}; expected {expected}"
         )
-    missing = [
-        artifact
-        for artifact in REQUIRED_ARTIFACTS.get(args.stage, [])
-        if not (run_dir(root, args.run) / artifact).is_file()
-        or (run_dir(root, args.run) / artifact).stat().st_size == 0
-    ]
-    if missing:
+    problems = gate_problems(root, args.run, args.stage)
+    if problems:
         raise SystemExit(
-            f"cannot advance to {args.stage}; missing or empty artifacts: {', '.join(missing)}"
+            f"cannot advance to {args.stage}; gate not passed: {'; '.join(problems)}"
         )
+    verdicts = stage_verdicts(root, args.run, args.stage)
     timestamp = now()
     state["stage"] = args.stage
     state["completed_stages"].append(args.stage)
@@ -143,6 +188,7 @@ def advance(args: argparse.Namespace) -> None:
             "event": f"advanced:{args.stage}",
             "at": timestamp,
             "repository_head": state["repository_head"],
+            "artifact_verdicts": verdicts,
         }
     )
     save(root, args.run, state)
