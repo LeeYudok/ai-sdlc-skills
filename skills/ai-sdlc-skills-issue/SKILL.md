@@ -5,7 +5,7 @@ description: Turn an issue number or a spec document into a tracked unit of work
 
 # Issue Intake and Branch
 
-Every change starts from a tracked issue. Accept either an issue number or a path to a spec/plan document; refuse to proceed with neither.
+Every change starts from a tracked issue. Accept an issue number, a path to a spec/plan document, or a free-form request stating what is wanted and why. With only a free-form request, do not ask the user to write the issue: derive scope, exclusions, and done criteria from repository evidence, draft the issue body yourself, confirm it in one message, then create the issue. Refuse only when the request states neither what should change nor why.
 
 1. **Resolve the forge** from the repository's remotes and project-local convention (GitHub → `gh`, GitLab → `glab`, other → ask). Follow the repository's own issue rules (labels, templates, which repository owns the code — file the issue where the code lives, not in a tracking-only repository).
 2. **Obtain the issue.**
