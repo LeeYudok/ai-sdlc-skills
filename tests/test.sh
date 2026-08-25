@@ -122,7 +122,55 @@ if python3 "$HANDOFF_SCRIPT" check --root "$SANDBOX" --run stock-auto-trading >/
   exit 1
 fi
 sed -i.bak 's/<!-- FILL -->//g' "$handoff_file" && rm -f "$handoff_file.bak"
-python3 "$HANDOFF_SCRIPT" check --root "$SANDBOX" --run stock-auto-trading >/dev/null
+if python3 "$HANDOFF_SCRIPT" check --root "$SANDBOX" --run stock-auto-trading >/dev/null 2>&1; then
+  echo "Handoff check passed with markers deleted but guidance text left in place" >&2
+  exit 1
+fi
+marker_only_report="$(python3 "$HANDOFF_SCRIPT" check --root "$SANDBOX" --run stock-auto-trading 2>&1 || true)"
+for expected in \
+  "goal: acceptance criteria are still placeholders" \
+  "current state: 'Verification status' still holds placeholder text" \
+  "decisions: no completed row" \
+  "remaining work: no concrete next action" \
+  "traps: only placeholder text" \
+  "resume procedure: unexecutable default" \
+  "files to load: no file listed"; do
+  case "$marker_only_report" in
+    *"$expected"*) ;;
+    *)
+      echo "Handoff check did not report: $expected" >&2
+      exit 1
+      ;;
+  esac
+done
+
+cp "$ROOT/tests/fixtures/handoff-ready.md" "$handoff_file"
+python3 "$HANDOFF_SCRIPT" check --root "$SANDBOX" --run stock-auto-trading >/dev/null || {
+  echo "Handoff check rejected a fully filled handoff" >&2
+  exit 1
+}
+
+ready_copy="$SANDBOX/handoff-ready.md"
+cp "$ROOT/tests/fixtures/handoff-ready.md" "$ready_copy"
+python3 - "$ready_copy" "$handoff_file" <<'PY'
+import sys
+from pathlib import Path
+
+source, target = Path(sys.argv[1]), Path(sys.argv[2])
+content = source.read_text(encoding="utf-8")
+start = content.index("## 3. Decisions (do not reopen)")
+end = content.index("## 4. Remaining work (in order)")
+target.write_text(
+    content[:start] + "## 3. Decisions (do not reopen)\n- 없음\n\n" + content[end:],
+    encoding="utf-8",
+)
+PY
+python3 "$HANDOFF_SCRIPT" check --root "$SANDBOX" --run stock-auto-trading >/dev/null || {
+  echo "Handoff check rejected an explicit '없음' decision section" >&2
+  exit 1
+}
+
+cp "$ROOT/tests/fixtures/handoff-ready.md" "$handoff_file"
 printf '%s
 ' 'api_key = abcdefghijklmnop1234' >> "$handoff_file"
 if python3 "$HANDOFF_SCRIPT" check --root "$SANDBOX" --run stock-auto-trading >/dev/null 2>&1; then
@@ -131,5 +179,14 @@ if python3 "$HANDOFF_SCRIPT" check --root "$SANDBOX" --run stock-auto-trading >/
 fi
 adhoc_file="$(python3 "$HANDOFF_SCRIPT" write --root "$SANDBOX")"
 [ "$adhoc_file" = "$(cd "$SANDBOX" && pwd -P)/.ai-sdlc/HANDOFF.md" ] || { echo "Ad-hoc handoff path wrong: $adhoc_file" >&2; exit 1; }
+sed -i.bak 's/<!-- FILL -->//g' "$adhoc_file" && rm -f "$adhoc_file.bak"
+adhoc_report="$(python3 "$HANDOFF_SCRIPT" check --root "$SANDBOX" 2>&1 || true)"
+case "$adhoc_report" in
+  *"resume procedure: unexecutable default \`git switch unknown\`"*) ;;
+  *)
+    echo "Ad-hoc handoff check did not reject 'git switch unknown'" >&2
+    exit 1
+    ;;
+esac
 
 echo "All tests passed"
