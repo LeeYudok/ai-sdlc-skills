@@ -35,7 +35,10 @@
 
 ## 보안
 
-- 자동 차단은 `.claude/hooks/pre-commit.sh`(`.env` 스테이징, `settings.json` 배선) 하나뿐. 그 외 P0 는 규율이다.
+- 자동 차단은 `.claude/hooks/pre-commit.sh` 하나뿐(`settings.json` 의 `PreToolUse(Bash)` 에 배선). 그 외 P0 는 규율이다.
+- **보장 범위**: 훅은 Bash 도구가 실행하려는 명령줄을 파싱해 **실제 커밋 대상 저장소**의 index 를 검사한다 — `git -C <repo> commit`, `cd <repo> && git commit`, 일반 `git commit`(대상은 `CLAUDE_PROJECT_DIR`) 모두. `.env`/`.env.*` 가 staged 면 exit 2 로 차단하고, `-a`/`-am` 은 tracked 수정본까지 함께 본다.
+- **fail closed**: 대상 저장소를 안전하게 판별할 수 없으면 커밋을 거부한다(exit 2) — 변수·명령치환이 섞인 경로, `--git-dir`/`--work-tree`/`GIT_DIR` 류 index 재배치, 존재하지 않는 디렉터리, 저장소가 아닌 경로, 훅 payload 파싱 실패.
+- **한계(우회 가능)**: ① Bash 도구를 거치지 않는 커밋(IDE·별도 터미널·MCP) ② 이전 Bash 호출에서 바뀐 세션 작업 디렉터리 — 훅은 세션 cwd 를 알 수 없어 `CLAUDE_PROJECT_DIR` 를 기준으로 삼는다 ③ `commit` 으로 확장되는 git alias·래퍼 스크립트 ④ `.env` 이름을 쓰지 않는 시크릿 파일. 회귀 테스트는 `tests/test_hook.sh`.
 - `curl` `-v`/`-sv` 금지 — 헤더에 시크릿 노출됨. `--silent` + status code만.
 
 ## 소통
