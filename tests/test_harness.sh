@@ -42,4 +42,35 @@ done
   [ -f "$MEM/$linked" ] || fail "MEMORY.md indexes missing file $linked"
 done
 
+# 6. 문서-스킬 동기화: 모든 스킬이 REFERENCE 와 skills/README 에 나열된다 (#38)
+for skill in "$ROOT"/skills/ai-sdlc-skills-*; do
+  [ -d "$skill" ] || continue
+  name="$(basename "$skill")"
+  grep -q "$name" "$ROOT/docs/REFERENCE.md" || fail "$name is not listed in docs/REFERENCE.md"
+  grep -q "$name" "$ROOT/skills/README.md" || fail "$name is not listed in skills/README.md"
+done
+
+# 7. 마크다운 상대 링크는 실재하는 파일을 가리킨다 (#38)
+python3 - "$ROOT" <<'PY' || fail "broken relative markdown link"
+import re
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+link = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
+broken = []
+for doc in root.rglob("*.md"):
+    if ".git" in doc.parts:
+        continue
+    for target in link.findall(doc.read_text(encoding="utf-8")):
+        target = target.split("#", 1)[0].strip()
+        if not target or "://" in target or target.startswith("mailto:"):
+            continue
+        if not (doc.parent / target).exists():
+            broken.append(f"{doc.relative_to(root)} -> {target}")
+if broken:
+    print("\n".join(broken), file=sys.stderr)
+    sys.exit(1)
+PY
+
 echo "harness invariants ok"

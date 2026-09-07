@@ -37,7 +37,8 @@
 `HANDOFF.md` 상태 스냅샷(목표·현재 상태·결정·남은 일·함정·재개 절차)을 남기고
 새 세션에서 그 문서부터 읽어 재개한다.
 
-스킬별 입력/출력 한눈에 보려면 [docs/REFERENCE.md](docs/REFERENCE.md) 참고.
+스킬 목록과 각 `SKILL.md` 링크는 [skills/README.md](skills/README.md),
+스킬별 입력/출력 아티팩트는 [docs/REFERENCE.md](docs/REFERENCE.md) 참고.
 설계 결정·비목표·불변 제약은 [CONTEXT.md](CONTEXT.md) 에 고정돼 있다 — 세션 시작 시 먼저 읽는다.
 큰 저장소에 단계적으로 도입하는 순서는 [docs/ADOPTION.md](docs/ADOPTION.md) 참고.
 
@@ -115,3 +116,6 @@ tests/test.sh
 
 pull request와 `main` 대상 push마다 GitHub Actions가 동일한 `tests/test.sh`를
 실행한다 (`.github/workflows/test.yml`). 필수 CI check 이름은 **`test`**.
+
+이 저장소에서 작업하는 에이전트·사람이 지켜야 할 규칙(P0/P1/P2)·워크플로는
+[AGENTS.md](AGENTS.md) 가 정본이다.

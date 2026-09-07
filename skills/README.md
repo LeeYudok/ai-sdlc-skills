@@ -5,6 +5,9 @@
 `.agents/skills/`로 복사·링크한다. 입력/출력 아티팩트까지 한눈에 보려면
 [docs/REFERENCE.md](../docs/REFERENCE.md) 참고.
 
+스킬을 추가·삭제하면 이 표와 `docs/REFERENCE.md` 를 같은 커밋에서 갱신한다 —
+누락되면 `tests/test_harness.sh` 가 실패한다.
+
 ## 파이프라인
 
 게이트 상태머신 순서(`ai-sdlc-skills-pipeline/scripts/pipeline_state.py`)대로:
@@ -12,6 +15,7 @@
 | 스킬 | 역할 |
 |---|---|
 | [ai-sdlc-skills-pipeline](ai-sdlc-skills-pipeline/SKILL.md) | 전체 파이프라인 오케스트레이션 |
+| [ai-sdlc-skills-issue](ai-sdlc-skills-issue/SKILL.md) | 이슈 인입 — forge 이슈·`<type>/issue-N-<slug>` 브랜치·run slug 고정 |
 | [ai-sdlc-skills-analyze](ai-sdlc-skills-analyze/SKILL.md) | 저장소 분석 |
 | [ai-sdlc-skills-evidence](ai-sdlc-skills-evidence/SKILL.md) | 다중 도구 증거 교차검증 |
 | [ai-sdlc-skills-ba](ai-sdlc-skills-ba/SKILL.md) | 비즈니스 분석 문서 |
