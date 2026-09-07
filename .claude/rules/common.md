@@ -1,51 +1,26 @@
 # 공통 규칙 (ai-sdlc-skills)
 
-<!-- paths 없음 → 세션 시작 시 항상 로드 -->
+P0/P1/P2 **규칙 목록의 정본은 [`AGENTS.md`](../../AGENTS.md)** 다 — Codex 등 `.claude/` 를 로드하지 않는 하네스도 절대 규칙에 닿아야 하므로 그 문서가 자체 완결이어야 한다(근거: `CONTEXT.md`).
+이 파일은 그 규칙을 **되풀이하지 않고**, 자동 강제 범위·한계·판단 기준만 보충한다. 규칙 자체를 바꾸려면 `AGENTS.md` 를 고친다.
 
-## 우선순위 체계
+## 자동 강제 vs 규율
 
-| 등급 | 의미 | 위반 시 |
-|------|------|---------|
-| **P0** | 절대 규칙 — 보안·데이터 파괴·시크릿 노출 | 즉시 중단, 사용자 에스컬레이션 |
-| **P1** | 필수 — 이슈 연결, 타입체크, 테스트 | PR/MR 차단 |
-| **P2** | 권장 — CC 임계값, 파일 크기 | 리뷰 지적 |
-
-## P0 — 절대 규칙 (예외 없음)
-
-- **시크릿**: `.env`/토큰/비밀번호를 코드·로그·이슈·채팅에 노출 금지. `source` 경유만.
-- **데이터**: 프로덕션 `DELETE/DROP/TRUNCATE` 전 사용자 명시 동의.
-- **git**: `force push`·`reset --hard` 전 확인. `.env` 스테이징 금지.
-- **인증**: 인증 없는 API 엔드포인트 신규 추가 금지.
-
-## P1 — 필수
-
-- **이슈 우선**: 작업은 이슈 트래커에 이슈 등록 → 번호를 브랜치/커밋/PR·MR에 박는다. trivial typo만 예외.
-- **git 동사 즉시 실행**: "푸시/머지/커밋/싱크/풀/배포" 명령엔 바로 실행. 파괴적 git만 별도 확인.
-- **commit 직전 브랜치 재확인**: 자동 프로세스가 `main` 으로 checkout 했을 수 있음.
-- **브랜치 전략**: `main`(prod) / `develop`(통합) / `feature·fix·chore`(작업) / `hotfix`(main 직접).
-- **이슈 클로즈**: forge 규약에 따름(`.claude/rules/forge.md`). GitHub=`Closes #N` 자동. GitLab 19=자동 클로즈 동작하나 머지 후 확인, `opened` 로 남은 경우만 수동.
-- **새 기능 = 테스트 동반**: 최소 1개 unit/integration 테스트.
-- **배포 전 버전 bump**: 배포되는 push 직전, 변경된 서비스의 버전 매니페스트(`package.json`/`pyproject.toml`/`Cargo.toml`/`build.gradle`) bump 를 patch/minor/major/no-bump 중 무엇으로 할지 물어 같은 커밋/푸시에 반영. 디폴트: 버그픽스→patch, 새 기능→minor, 호환성 파괴→major, 인프라만(CI/scripts/docs)→no-bump. 명시적 "그냥 푸시"면 bump 생략. `[규율]`
-
-## P2 — 권장
-
-- 함수 인지 복잡도(CC) 15 이하.
-- 파일 300줄 초과 시 분리 검토.
-- TODO/FIXME 에 이슈 번호 병기.
-
-## 보안
-
-- 자동 차단은 `.claude/hooks/pre-commit.sh` 하나뿐(`settings.json` 의 `PreToolUse(Bash)` 에 배선). 그 외 P0 는 규율이다.
-- **보장 범위**: 훅은 Bash 도구가 실행하려는 명령줄을 파싱해 **실제 커밋 대상 저장소**의 index 를 검사한다 — `git -C <repo> commit`, `cd <repo> && git commit`, 일반 `git commit`(대상은 `CLAUDE_PROJECT_DIR`) 모두. `.env`/`.env.*` 가 staged 면 exit 2 로 차단하고, `-a`/`-am` 은 tracked 수정본까지 함께 본다.
+- 자동 차단은 `.claude/hooks/pre-commit.sh` 하나뿐(`settings.json` 의 `PreToolUse(Bash)` 에 배선). 그 외 P0/P1 은 전부 **규율**이며, `tests/test.sh` 를 직접 돌려야 확인된다.
+- **훅의 보장 범위**: Bash 도구가 실행하려는 명령줄을 파싱해 **실제 커밋 대상 저장소**의 index 를 검사한다 — `git -C <repo>` 커밋, `cd <repo> &&` 후의 커밋, 대상이 `CLAUDE_PROJECT_DIR` 인 일반 커밋 모두. `.env`/`.env.*` 가 staged 면 exit 2 로 차단하고, `-a`/`-am` 은 tracked 수정본까지 함께 본다.
 - **fail closed**: 대상 저장소를 안전하게 판별할 수 없으면 커밋을 거부한다(exit 2) — 변수·명령치환이 섞인 경로, `--git-dir`/`--work-tree`/`GIT_DIR` 류 index 재배치, 존재하지 않는 디렉터리, 저장소가 아닌 경로, 훅 payload 파싱 실패.
-- **한계(우회 가능)**: ① Bash 도구를 거치지 않는 커밋(IDE·별도 터미널·MCP) ② 이전 Bash 호출에서 바뀐 세션 작업 디렉터리 — 훅은 세션 cwd 를 알 수 없어 `CLAUDE_PROJECT_DIR` 를 기준으로 삼는다 ③ `commit` 으로 확장되는 git alias·래퍼 스크립트 ④ `.env` 이름을 쓰지 않는 시크릿 파일. 회귀 테스트는 `tests/test_hook.sh`.
-- `curl` `-v`/`-sv` 금지 — 헤더에 시크릿 노출됨. `--silent` + status code만.
+- **한계(우회 가능)**: ① Bash 도구를 거치지 않는 커밋(IDE·별도 터미널·MCP) ② 이전 Bash 호출에서 바뀐 세션 작업 디렉터리 — 훅은 세션 cwd 를 알 수 없어 `CLAUDE_PROJECT_DIR` 를 기준으로 삼는다 ③ 커밋으로 확장되는 git alias·래퍼 스크립트 ④ `.env` 이름을 쓰지 않는 시크릿 파일.
+- **오탐**: 훅은 Bash 명령줄 전체를 훑으므로 heredoc 본문처럼 커밋과 무관한 텍스트에 커밋 명령 문자열이 섞여 있으면 fail closed 로 막힌다. 그런 파일은 Bash heredoc 대신 파일 쓰기 도구로 만든다. 회귀 테스트는 `tests/test_hook.sh`.
+- **문서-코드 동기화**는 `tests/test_harness.sh` 가 강제한다 — 스킬이 `docs/REFERENCE.md`·`skills/README.md` 에 빠지거나 저장소 마크다운의 상대 링크가 깨지면 실패한다.
+
+## 이 저장소에 적용되지 않는 규칙
+
+- **배포 전 버전 bump**: 소비자 저장소용 규율이다. 이 저장소에는 버전 매니페스트(`package.json`/`pyproject.toml`/`Cargo.toml`/`build.gradle`)도 배포 파이프라인도 없으므로 대상이 아니다. 매니페스트가 생기는 순간 `AGENTS.md` P1 에 올린다.
 
 ## 소통
 
-- 대화형 응답은 가벼운 구어체. **코드·커밋·이슈/PR·MR 본문·문서는 표준/전문 톤** 유지.
+- 대화형 응답은 가벼운 구어체. **코드·커밋·이슈/PR 본문·문서는 표준/전문 톤** 유지.
 - 상태 질문엔 yes/no + 짧은 근거. 디버깅은 실제 에러 원문 먼저 확보 후 행동.
-- 부수효과 큰 작업(DB write·push·배포)은 사용자 명시 실행 신호 후 시작.
+- 부수효과 큰 작업(DB write·push·배포)은 사용자 명시 실행 신호 후 시작. `AGENTS.md` 의 "git 동사 즉시 실행" 은 그 명시 명령 자체를 가리키므로 예외가 아니다.
 
 ## 코드 탐색
 
@@ -54,4 +29,4 @@
 ## 메모리
 
 - SSOT는 `.claude/memory/`. 타입접두 `project_`/`feedback_`/`reference_`/`user_`. 자세히는 `memory/README.md`.
-- `user_*.md` 만 개인(gitignore), 그 외 팀 공유.
+- `user_*.md` 만 개인(gitignore), 그 외 팀 공유. 구조 위반은 `tests/test_harness.sh` 가 차단한다.

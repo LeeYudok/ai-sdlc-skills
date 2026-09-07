@@ -26,12 +26,15 @@
 | 규칙은 `.claude/rules/` 에 스코프(glob)별로 분리, 항상 로드는 `common.md`·`forge.md` 만 | 항상 로드되는 텍스트는 매 턴 컨텍스트를 먹는다. 파일을 만질 때만 필요한 규칙은 그때만 | 단일 거대 CLAUDE.md |
 | `.claude/` 는 동작하는 최소만: rules 3개·pre-commit 훅 1개(배선됨)·memory. 루트 `CLAUDE.md` 는 `@AGENTS.md` 한 줄 | 미배선 훅 6개·유입 메모리·중복 스킬·허구 README 가 쌓여 "설명이 동작보다 많은" 상태였다. dead file 은 감사 비용과 거짓 `[자동강제]` 주장을 낳는다 (#14) | 템플릿 통째 복사 후 방치 |
 | `AGENTS.md` 는 자체 완결 — P0/P1 을 본문에 직접 두고 `@` import 등 하네스 전용 문법을 쓰지 않음 | Codex 등 AGENTS.md 호환 에이전트는 `.claude/` 를 로드하지 않는다. 참조 링크에 의존하면 그 하네스에서 절대 규칙에 도달하지 못한다 | `.claude/rules/` 를 가리키는 링크만 두기 |
+| PR·`main` push 마다 GitHub Actions 가 `tests/test.sh` 하나만 실행, 필수 check 이름은 `test` | 로컬 실행을 잊은 채 올라온 변경을 막는 최소 게이트. 검증 진입점이 여럿이면 로컬과 CI 가 갈린다 (#27) | 린트·포맷·매트릭스 잡을 따로 두기 |
+| 규칙 목록은 `AGENTS.md` 한 곳, `.claude/rules/` 는 보장 범위·한계만 보충 | 같은 P0/P1 을 두 파일에 적어 두자 실제로 내용이 갈렸다(한쪽에만 있는 P1 4개). 링크 대신 중복은 드리프트를 구조적으로 재생산한다 (#38) | 양쪽에 전문을 두고 리뷰로 동기화 |
 | 모든 워커는 각자의 git worktree 로 격리, 정식 클론은 default 브랜치 미러로 읽기 전용 | 공유 체크아웃을 쓰던 병렬 세션 두 개가 서로의 작업을 교차오염시킨 사고. 공유 폴더에서 브랜치를 갈아타면 다른 세션의 발밑이 바뀌고, `git add -A` 는 남의 미커밋 작업을 흡수한다. 오케스트레이터(Orca 등)가 worktree 를 소유하면 수동 조작이 도구 상태와 어긋나므로 위임 | 공유 체크아웃 + 브랜치 전환 |
 
 ## 불변 제약
 
 - 시크릿·내부 URL 은 저장소와 생성 문서에 기록하지 않는다 (P0, `.claude/rules/common.md`).
 - 도구 부재 시 외부 전송·무거운 서비스를 자동 활성화하지 않는다.
+- 문서와 코드의 동기화(스킬 목록·마크다운 상대 링크)는 `tests/test_harness.sh` 불변식으로 강제한다 — 리뷰 눈으로 지키지 않는다.
 - 산출물 경로·상태 이름은 `skills/ai-sdlc-skills-pipeline/references/artifact-contract.md` 와 `pipeline_state.py` 의 `REQUIRED_ARTIFACTS` 가 단일 진실원천.
 
 ## 세션 시작 시 읽을 최소 파일
