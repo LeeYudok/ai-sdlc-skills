@@ -1,11 +1,11 @@
 ---
 name: ai-sdlc-skills-handoff
-description: Write a HANDOFF.md state snapshot so a fresh session can resume the current run without re-deriving context, and resume from an existing HANDOFF.md. Use when context usage approaches ~40-50%, before a deliberate session break, or when the user asks to hand off / resume work.
+description: Generate, validate, and resume the HANDOFF.md state snapshot for an .ai-sdlc pipeline run. Use when that run needs a checked state record across sessions; follow the repository's separate handoff or issue workflow for delivering the session to another person or agent.
 ---
 
 # Session Handoff
 
-A long pipeline rarely fits one context window. Once usage passes roughly half the window, earlier instructions dilute and the model starts citing its own mistakes. Compaction hides what was lost; an explicit handoff document does not. This skill writes that document and defines how the next session picks it up.
+This skill writes and checks the state snapshot for an `.ai-sdlc` run. It does not define how the repository delivers that state through an issue, ticket, or message. When a session handoff is requested, follow the repository's handoff workflow after this snapshot passes `check`.
 
 ## Write a handoff
 
